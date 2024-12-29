@@ -1,4 +1,4 @@
-const { getPedidos, getPedidosByUser } = require('../models/pedidoModel');
+const { getPedidos, getPedidosByUser, insertarPedidoConDetalles } = require('../models/pedidoModel');
 
 const fetchPedidos = async (req, res) => {
   try {
@@ -19,6 +19,16 @@ const fetchPedidosByUser = async (req, res) => {
     }
   };
 
+  const newPedido = async (req, res) => {
+    const { pedido, detalles } = req.body;
+    try {
+      const pedidos = await insertarPedidoConDetalles(pedido, detalles)
+      res.status(200).json(pedidos);
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  };
+
 /*const addCliente = async (req, res) => {
   const { ruc, nombre, direccion, ciudad, telefono, email } = req.body;
   try {
@@ -32,4 +42,5 @@ const fetchPedidosByUser = async (req, res) => {
 module.exports = {
     fetchPedidos,
     fetchPedidosByUser,
+    newPedido
 };

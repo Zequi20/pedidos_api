@@ -12,15 +12,47 @@ const getPedidosByUser = async (idUsuario) => {
     return result.rows;
   };
 
-/*const createUsuario = async (nombre, direccion, telefono, contrasena, cargo) => {
-  const result = await pool.query(
-    'INSERT INTO usuario (nombre, direccion, telefono, contrasena, cargo) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-    [nombre, direccion, telefono, contrasena, cargo]
-  );
-  return result.rows[0];
-};*/
+  // Insertar un pedido con detalles
+const insertarPedidoConDetalles = async (pedido, detalles) => {
+  try {
+    // Convertir los detalles a JSON
+    const detallesJSON = JSON.stringify(detalles);
+
+    // Ejecutar el procedimiento almacenado
+    await pool.query(
+      `CALL insertar_pedido_con_detalles(
+        $1::SMALLINT,
+        $2::SMALLINT,
+        $3::VARCHAR,
+        $4::INTEGER,
+        $5::DATE,
+        $6::FLOAT,
+        $7::SMALLINT,
+        $8::BOOLEAN,
+        $9::JSON
+      );`,
+      [
+        pedido.id_mesa,
+        pedido.comensal,
+        pedido.ubicacion,
+        pedido.id_cliente,
+        pedido.fecha_hora,
+        pedido.total,
+        pedido.id_usuario,
+        pedido.estado,
+        detallesJSON,
+      ]
+    );
+
+    return { message: 'Pedido y detalles insertados correctamente' };
+  } catch (error) {
+    console.error('Error al insertar pedido:', error);
+    throw new Error('No se pudo insertar el pedido con detalles.');
+  }
+};
 
 module.exports = {
+    insertarPedidoConDetalles,
     getPedidos,
     getPedidosByUser,
 };
